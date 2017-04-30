@@ -1,0 +1,22 @@
+# This file managed by Chef. Local changes will be overwritten.
+# System-wide configuration
+
+<%- @config.keys.each do |section| -%>
+<%- next if section == 'system_user' -%>
+[<%= section %>]
+<%- @config[section].each do |key, value| -%>
+<%- next if value.nil? %>
+<%- case -%>
+<%- when [true, false].include?(value) -%>
+<%= key %> = <%= value.inspect.capitalize %>
+<%- when value.is_a?(Hash) -%>
+<%= key %> = <%= value.inspect.gsub('=>', ': ') %>
+<%- else %>
+<%= key %> = <%= value %>
+<%- end -%>
+<%- end -%>
+
+<%- end -%>
+[system_user]
+user = <%= node['st2']['config']['system_user']['user'] || node['st2']['system_user']['user'] %>
+ssh_key_file = <%= node['st2']['config']['system_user']['ssh_key_file'] || ::File.join(node['st2']['system_user']['home'] || "/home/#{node['st2']['system_user']['user']}", '.ssh', 'id_rsa') %>
